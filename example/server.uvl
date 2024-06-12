@@ -1,0 +1,24 @@
+namespace Server
+
+features
+  Server {abstract}
+    mandatory
+      FileSystem
+        or // with cardinality: [1..*]
+          NTFS
+          APFS
+          EXT4
+      OperatingSystem {abstract}
+        alternative
+          Windows
+          macOS
+          Debian
+    optional
+      Logging	{
+      default,
+      log_level "warn" // Feature Attribute
+    }
+
+constraints
+  Windows => NTFS
+  macOS => APFS
