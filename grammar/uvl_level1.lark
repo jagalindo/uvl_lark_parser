@@ -1,28 +1,22 @@
-?start: NEWLINE* featureModel
-featureModel: features NEWLINE? 
+?start: _NL* featuremodel
 
-features: "features" NEWLINE _INDENT feature _DEDENT
+featuremodel: "features" _NL [_INDENT feature+ _DEDENT]
+feature: NAME _NL (_INDENT group+ _DEDENT)?
 
-feature: CNAME NEWLINE (_INDENT group+ _DEDENT)?
+group: "or" groupspec          -> or_group
+| "alternative" groupspec -> alternative_group
+| "optional" groupspec    -> optional_group
+| "mandatory" groupspec   -> mandatory_group
+| cardinality groupspec   -> cardinality_group
 
-group
-    : "or" groupSpec          -> or_group
-    | "alternative" groupSpec -> alternative_group
-    | "optional" groupSpec    -> optional_group
-    | "mandatory" groupSpec   -> mandatory_group
-    | CARDINALITY groupSpec   -> cardinality_group
+groupspec: _NL _INDENT feature+ _DEDENT
 
-groupSpec: NEWLINE _INDENT feature+ _DEDENT
+cardinality: "[" INT (".." (INT | "*"))? "]"
 
-CARDINALITY: "[" INT (".." (INT | "*"))? "]"
-
-COMMENT: "//" /[^\n]*/
-%ignore COMMENT
+%import common.INT
+%import common.CNAME -> NAME
+%import common.WS_INLINE
+%declare _INDENT _DEDENT
 %ignore WS_INLINE
 
-%import common.CNAME
-%import common.NEWLINE
-%import common.WS_INLINE
-%import common.INT
-
-%declare _INDENT _DEDENT
+_NL: /(\r?\n[\t ]*)+/
